@@ -1,5 +1,5 @@
-# -- coding: utf-8 --
 import re
+from urllib.parse import urlparse
 import requests
 from requests.exceptions import SSLError
 
@@ -34,8 +34,8 @@ def redirect(url: str):
         return False
 
 
-print(
-    redirect('https://stackoverflow.com/questions/30862099/how-can-i-get-certificate-issuer-information-in-python%27'))
+# print(
+#     redirect('https://stackoverflow.com/questions/30862099/how-can-i-get-certificate-issuer-information-in-python%27'))
 
 
 def sings_of_potentional_danger(url: str):
@@ -51,7 +51,7 @@ def sings_of_potentional_danger(url: str):
     print(data)
 
 
-sings_of_potentional_danger('http://zlo.ru/%27')
+# sings_of_potentional_danger('http://zlo.ru/%27')
 
 
 def short_url(url: str) -> int:
@@ -70,19 +70,19 @@ def short_url(url: str) -> int:
         return 0
 
 
-print(short_url('https://clck.ru/33ZeBK'))
+# print(short_url('https://clck.ru/33ZeBK'))
 
 
 def count_www(url: str) -> int: match = re.findall(r'www', url); return len(match)
 
 
-print(count_www('www.wwwqwsertyjuk.com'))
+# print(count_www('www.wwwqwsertyjuk.com'))
 
 
 def count_dir(url: str) -> int: match = re.findall(r'/', url); return len(match)
 
 
-print(count_dir('https://regex101.com/r_/aGn8Q_C/2'))
+# print(count_dir('https://regex101.com/r_/aGn8Q_C/2'))
 
 
 def count_https(url: str) -> int: match = re.findall('https', url); return len(match)
@@ -108,10 +108,12 @@ def url_len(url: str) -> int: return len(url)
 
 def count_dot(url: str) -> int: match = re.findall('\.', url); return len(match)
 
-def embeded_domains(url: str) -> int: match = re.findall('[a-z]+\.', url); return len(match)
 
+def embeded_domains(url: str) -> int: urldir = urlparse(url).path; return urldir.count('//')
+
+
+print(embeded_domains('https://api.github.com/k1rill-dev/ScarQR_API/blob/master/tools.py'))
 
 import joblib
 
 model = joblib.load('model/my_model.pkl')
-
