@@ -27,6 +27,9 @@ async def check_qr_post(qr: Qr):
     return {"success": True,
             "data": value}
 
+@app.post("/")
+async def hello():
+    return {'hello': 'hello'}
 
 @app.get("/check_qr")
 async def check_qr_get():
