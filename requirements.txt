@@ -5,3 +5,4 @@ pyzbar
 requests
 joblib
 lightgbm
+xgboost

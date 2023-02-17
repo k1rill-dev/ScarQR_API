@@ -1,6 +1,11 @@
+# -- coding: utf-8 --
 import re
 from urllib.parse import urlparse
+import joblib
+from tld import get_tld
+import os.path
 import requests
+import xgboost as xgb
 from requests.exceptions import SSLError
 
 
@@ -19,7 +24,7 @@ def ssl(url: str):
     return data_ssl
 
 
-print(ssl('http://www.shkola12.rostovgrad.ru/%27'))
+# print(ssl('http://www.shkola12.rostovgrad.ru/%27'))
 
 
 def redirect(url: str):
@@ -79,7 +84,7 @@ def count_www(url: str) -> int: match = re.findall(r'www', url); return len(matc
 # print(count_www('www.wwwqwsertyjuk.com'))
 
 
-def count_dir(url: str) -> int: match = re.findall(r'/', url); return len(match)
+def count_dir(url: str) -> int: match = re.findall(r'/', url); return len(match) - 2
 
 
 # print(count_dir('https://regex101.com/r_/aGn8Q_C/2'))
@@ -100,10 +105,24 @@ def count_ask(url: str) -> int: match = re.findall('\?', url); return len(match)
 def count_min(url: str) -> int: match = re.findall('-', url); return len(match)
 
 
+def count_dig(url: str) -> int: match = re.findall('\d', url); return len(match)
+
+
+def count_let(url: str) -> int:
+    if 'https://' in url or 'http://' in url:
+        match = re.findall('\w', url.split('://')[1])
+    else:
+        match = re.findall('\w', url)
+    return len(match)
+
+
 def count_rav(url: str) -> int: match = re.findall('=', url); return len(match)
 
 
-def url_len(url: str) -> int: return len(url)
+def url_len(url: str) -> int:
+    if 'https://' in url or 'http://' in url:
+        return len(url.split('://')[1])
+    return len(url)
 
 
 def count_dot(url: str) -> int: match = re.findall('\.', url); return len(match)
@@ -112,8 +131,73 @@ def count_dot(url: str) -> int: match = re.findall('\.', url); return len(match)
 def embeded_domains(url: str) -> int: urldir = urlparse(url).path; return urldir.count('//')
 
 
-print(embeded_domains('https://api.github.com/k1rill-dev/ScarQR_API/blob/master/tools.py'))
+def hostname_len(url: str) -> int:
+    if 'https://' in url or 'http://' in url:
+        return len(url.split('://')[1].split('/')[0])
+    return len(url.split('/')[0])
 
-import joblib
+
+def sus_url(url: str) -> int:
+    match = re.search(
+        'PayPal|login|signin|bank|account|update|free|lucky|service|bonus|ebayisapi|webscr', url)
+    if match:
+        return 1
+    else:
+        return 0
+
+
+def use_of_ip(url: str):
+    if re.search(r'\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}', url):
+        return 1
+    return 0
+
+
+def count_dog(url: str) -> int: match = re.findall('@', url); return len(match)
+
+
+def fd_length(url):
+    urlpath = urlparse(url).path
+    try:
+        return len(urlpath.split('/')[1])
+    except:
+        return 0
+
+
+def tld_length(tld):
+    try:
+        return len(tld)
+    except:
+        return -1
+
+
+def abnormal_url(url):
+    hostname = urlparse(url).hostname
+    hostname = str(hostname)
+    match = re.search(hostname, url)
+    if match:
+        # print match.group()
+        return 1
+    else:
+        # print 'No matching pattern found'
+        return 0
+
+
+# print(embeded_domains('https://api.github.com/k1rill-dev/ScarQR_API/blob/master/tools.py'))
+
+
+url = 'myspace.com/thewarrenbrothers/blog'
+
+signs_pred = [[use_of_ip(url),  count_dot(url), count_www(url), count_dog(url),
+               count_dir(url), embeded_domains(url), short_url(url), count_https(url),
+               count_http(url), count_per(url), count_ask(url), count_min(url),
+               count_rav(url), url_len(url), hostname_len(url), sus_url(url),
+               count_dig(url), count_let(url)]]
 
 model = joblib.load('model/my_model.pkl')
+
+print(model.predict(signs_pred))
+
+# bst = xgb.Booster({'nthread': 4})  # init model
+# bst.load_model('model/model.txt')  # load data
+#
+# print(bst.predict(xgb.DMatrix(signs_pred)))
