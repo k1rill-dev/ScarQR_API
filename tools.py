@@ -109,3 +109,9 @@ def url_len(url: str) -> int: return len(url)
 def count_dot(url: str) -> int: match = re.findall('\.', url); return len(match)
 
 def embeded_domains(url: str) -> int: match = re.findall('[a-z]+\.', url); return len(match)
+
+
+import joblib
+
+model = joblib.load('model/my_model.pkl')
+

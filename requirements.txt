@@ -2,3 +2,6 @@ fastapi
 opencv-python
 pyqrcode
 pyzbar
+requests
+joblib
+lightgbm

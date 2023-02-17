@@ -4,6 +4,8 @@ from fastapi import FastAPI
 from scan_qr import detect_qr
 from pydantic import BaseModel as PydanticBaseModel
 import base64
+import joblib
+
 
 
 class BaseModel(PydanticBaseModel):
@@ -16,6 +18,8 @@ class Qr(BaseModel):
 
 
 app = FastAPI()
+
+
 
 
 @app.post("/check_qr")
