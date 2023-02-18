@@ -63,8 +63,17 @@ def short_url(url: str) -> int:
 
 def count_www(url: str) -> int: match = re.findall(r'www', url); return len(match)
 
+def count_tag(url: str) -> int: match = re.findall(r'#', url); return len(match)
 
-def count_dir(url: str) -> int: match = re.findall(r'/', url); return len(match) - 2
+def count_vos(url: str) -> int: match = re.findall(r'!', url); return len(match)
+
+def count_plus(url: str) -> int: match = re.findall(r'\+', url); return len(match)
+def count_star(url: str) -> int: match = re.findall(r'\*', url); return len(match)
+
+def count_comma(url: str) -> int: match = re.findall(r',', url); return len(match)
+
+def count_dollar(url: str) -> int: match = re.findall(r'\$', url); return len(match)
+def count_dir(url: str) -> int: match = re.findall(r'/', url); return len(match)
 
 
 def count_https(url: str) -> int: match = re.findall('https', url); return len(match)

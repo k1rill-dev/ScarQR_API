@@ -9,6 +9,9 @@ from utils import check_ssl, check_redirect, count_https, count_http
 
 app = FastAPI()
 
+
+# print(predict := Predict(url='http://pashminaonline.com')._signs_pred())
+
 @app.post("/phishing")
 async def phising_url(url: URL) -> dict:
     predict = Predict(url=url.url).predict_url()
