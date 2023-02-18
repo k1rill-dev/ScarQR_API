@@ -2,22 +2,25 @@
 import re
 from urllib.parse import urlparse
 import requests
+import ssl
+import socket
 from requests.exceptions import SSLError
 
 
-def check_ssl(url: str) -> dict:
-    data_ssl = {}
-    if url.split('://')[0] == 'https':
-        data_ssl['availability'] = True
+def check_ssl(url: str) -> bool:
+    if 'http' in url or 'https' in url:
+        url = urlparse(url).netloc
     else:
-        data_ssl['availability'] = False
+        url = url.split('/')[0]
+    print(url)
     try:
-        requests.get(url)
-        data_ssl['invalid_ssl'] = False
-    except SSLError:
-        data_ssl['invalid_ssl'] = True
-
-    return data_ssl
+        ctx = ssl.create_default_context()
+        with ctx.wrap_socket(socket.socket(), server_hostname=url) as s:
+            s.connect((url, 443))
+            cert = s.getpeercert()
+            return True
+    except ssl.SSLError:
+        return False
 
 
 def check_redirect(url: str):
@@ -63,16 +66,25 @@ def short_url(url: str) -> int:
 
 def count_www(url: str) -> int: match = re.findall(r'www', url); return len(match)
 
+
 def count_tag(url: str) -> int: match = re.findall(r'#', url); return len(match)
+
 
 def count_vos(url: str) -> int: match = re.findall(r'!', url); return len(match)
 
+
 def count_plus(url: str) -> int: match = re.findall(r'\+', url); return len(match)
+
+
 def count_star(url: str) -> int: match = re.findall(r'\*', url); return len(match)
+
 
 def count_comma(url: str) -> int: match = re.findall(r',', url); return len(match)
 
+
 def count_dollar(url: str) -> int: match = re.findall(r'\$', url); return len(match)
+
+
 def count_dir(url: str) -> int: match = re.findall(r'/', url); return len(match)
 
 
@@ -164,6 +176,3 @@ def abnormal_url(url):
         return 1
     else:
         return 0
-
-
-
