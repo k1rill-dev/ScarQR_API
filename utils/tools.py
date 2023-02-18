@@ -21,6 +21,8 @@ def check_ssl(url: str) -> bool:
             return True
     except ssl.SSLError:
         return False
+    except socket.gaierror:
+        return False
 
 
 def check_redirect(url: str):
