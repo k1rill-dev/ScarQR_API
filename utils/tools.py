@@ -1,15 +1,11 @@
 # -- coding: utf-8 --
 import re
 from urllib.parse import urlparse
-import joblib
-from tld import get_tld
-import os.path
 import requests
-import xgboost as xgb
 from requests.exceptions import SSLError
 
 
-def ssl(url: str):
+def check_ssl(url: str) -> dict:
     data_ssl = {}
     if url.split('://')[0] == 'https':
         data_ssl['availability'] = True
@@ -24,10 +20,7 @@ def ssl(url: str):
     return data_ssl
 
 
-# print(ssl('http://www.shkola12.rostovgrad.ru/%27'))
-
-
-def redirect(url: str):
+def check_redirect(url: str):
     list_redirect = []
     response = requests.get(url)
     if response.history:
@@ -37,10 +30,6 @@ def redirect(url: str):
         return list_redirect, final_url
     else:
         return False
-
-
-# print(
-#     redirect('https://stackoverflow.com/questions/30862099/how-can-i-get-certificate-issuer-information-in-python%27'))
 
 
 def sings_of_potentional_danger(url: str):
@@ -54,9 +43,6 @@ def sings_of_potentional_danger(url: str):
     if re.search(r'\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}', url):
         data['dog'] = {'danger': True, "final_url": url}
     print(data)
-
-
-# sings_of_potentional_danger('http://zlo.ru/%27')
 
 
 def short_url(url: str) -> int:
@@ -75,19 +61,10 @@ def short_url(url: str) -> int:
         return 0
 
 
-# print(short_url('https://clck.ru/33ZeBK'))
-
-
 def count_www(url: str) -> int: match = re.findall(r'www', url); return len(match)
 
 
-# print(count_www('www.wwwqwsertyjuk.com'))
-
-
 def count_dir(url: str) -> int: match = re.findall(r'/', url); return len(match) - 2
-
-
-# print(count_dir('https://regex101.com/r_/aGn8Q_C/2'))
 
 
 def count_https(url: str) -> int: match = re.findall('https', url); return len(match)
@@ -175,29 +152,9 @@ def abnormal_url(url):
     hostname = str(hostname)
     match = re.search(hostname, url)
     if match:
-        # print match.group()
         return 1
     else:
-        # print 'No matching pattern found'
         return 0
 
 
-# print(embeded_domains('https://api.github.com/k1rill-dev/ScarQR_API/blob/master/tools.py'))
 
-
-url = 'myspace.com/thewarrenbrothers/blog'
-
-signs_pred = [[use_of_ip(url),  count_dot(url), count_www(url), count_dog(url),
-               count_dir(url), embeded_domains(url), short_url(url), count_https(url),
-               count_http(url), count_per(url), count_ask(url), count_min(url),
-               count_rav(url), url_len(url), hostname_len(url), sus_url(url),
-               count_dig(url), count_let(url)]]
-
-model = joblib.load('model/my_model.pkl')
-
-print(model.predict(signs_pred))
-
-# bst = xgb.Booster({'nthread': 4})  # init model
-# bst.load_model('model/model.txt')  # load data
-#
-# print(bst.predict(xgb.DMatrix(signs_pred)))
